@@ -1,6 +1,8 @@
 import React from 'react';
-import useAxios from "./hooks/useAxios";
+// import useAxios from "./hooks/useLocalStorage";
 import './App.css';
+import axios from "axios";
+import Navbar from "./Navbar";
 
 class App extends React.Component {
   
@@ -11,20 +13,26 @@ class App extends React.Component {
         name: "",
         country: "",
         searches: 0,
-        id: 0
+        id: null
       }]
     }
-    this.response= useAxios('http://localhost:5000/api/players')
+    
   }
 
   componentDidMount() {
-    this.setState(this.state.womenPlayers, ...this.response)
+    axios.get('http://localhost:5000/api/players')
+    .then(response => {
+      this.setState({
+        womenPlayers: [ ...response.data]
+      })
+    })
   }
   render() {
     return (
-      <div>
+      <div className='App'>
+        <Navbar />
         {this.state.womenPlayers.map(womanPlayer =>
-          <WomenPlayersComponent key={womanPlayer.id} props={womanPlayer} />
+          <WomenPlayersComponent key={womanPlayer.id} womanPlayer={womanPlayer} />
         )}
       </div>
     )
@@ -35,8 +43,8 @@ class App extends React.Component {
 export default App;
 
 
-function WomenPlayersComponent(props) {
-  const {name, searches, country} = props
+function WomenPlayersComponent({womanPlayer}) {
+  const {name, searches, country} = womanPlayer
   return (
     <div>
       <p>Name: {name}</p>
